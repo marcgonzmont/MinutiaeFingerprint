@@ -66,8 +66,9 @@ def plotImages(titles, images, title, row, col):
         plt.gray()
         plt.axis('off')
 
-    plt.tight_layout()
     fig.suptitle(title, fontsize=14)
+    fig.tight_layout()
+    # fig.subplots_adjust(left=0, right=0, top=0, bottom=0)
     plt.show()
 
 def split_train_test(data, test_ratio):

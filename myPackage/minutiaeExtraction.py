@@ -2,7 +2,11 @@ import cv2
 import numpy as np
 from myPackage import tools as tl
 
-def process(skeleton, plot= False):
+def process(skeleton, name, plot= False, path= None):
+    print("Minutiae extraction...")
+
+
+def processHarris(skeleton, name, plot= False, path= None):
     # harris_corners = np.zeros_like(skeleton.shape, cv2.CV_32FC1)
     harris_corners = cv2.cornerHarris(skeleton, 2, 3, 0.04, cv2.BORDER_DEFAULT)
     harris_normalised = cv2.normalize(harris_corners, 0, 255, cv2.NORM_MINMAX, cv2.CV_32FC1)
@@ -13,7 +17,7 @@ def process(skeleton, plot= False):
     # vect = []
     for i in range(2):
         vect = np.hstack(rescaled)
-    from_to = [ 0.0, 1.1, 2.2 ]
+    from_to = [0.0, 1.1, 2.2]
     cv2.mixChannels(vect, harris_c, from_to)
     for x in range(harris_normalised.cols):
         for y in range(harris_normalised.rows):
