@@ -43,11 +43,12 @@ def image_enhance(gray, name, plot= False, path= None):
         if not exists(new_path):
             tl.makeDir(new_path)
         dst = altsep.join((new_path, (name + ".png")))
-        cv2.imwrite(dst, img_enhanced)
+        img_color = cv2.cvtColor(img_enhanced, cv2.COLOR_GRAY2BGR)
+        cv2.imwrite(dst, img_color)
 
     if plot:
         cv2.imshow("Enhanced '{}'".format(name), img_enhanced)
-        cv2.waitKey(1000)
+        cv2.waitKey(2000)
         cv2.destroyAllWindows()
 
     return img_enhanced

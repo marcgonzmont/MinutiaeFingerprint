@@ -30,7 +30,7 @@ def cleanImage(bin_img, name, plot= False, path= None):
 
     if plot:
         cv2.imshow("Cleaned '{}'".format(name), cleaned)
-        cv2.waitKey(1000)
+        cv2.waitKey(2000)
         cv2.destroyAllWindows()
 
     return cleaned
@@ -52,15 +52,16 @@ def blurrImage(nameImage, name, plot= False, path= None):
         if not exists(new_path):
             tl.makeDir(new_path)
         dst = altsep.join((new_path, (name + ".png")))
-        cv2.imwrite(dst, cleaned)
+        img_color = cv2.cvtColor(cleaned, cv2.COLOR_GRAY2BGR)
+        cv2.imwrite(dst, img_color)
 
     if plot:
         cv2.imshow("Original '{}'".format(name), image)
-        cv2.waitKey(1000)
+        cv2.waitKey(2000)
         cv2.destroyAllWindows()
 
         cv2.imshow("Cleaned '{}'".format(name), cleaned)
-        cv2.waitKey(1000)
+        cv2.waitKey(2000)
         cv2.destroyAllWindows()
     return cleaned
 
@@ -141,7 +142,7 @@ def thinImage(image, name, plot= False, path= None):
 
     if plot:
         cv2.imshow("Thinning '{}'".format(name), thinned)
-        cv2.waitKey(1000)
+        cv2.waitKey(2000)
         cv2.destroyAllWindows()
 
     return thinned

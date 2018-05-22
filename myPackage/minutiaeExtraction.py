@@ -1,32 +1,42 @@
 import cv2
 import numpy as np
 from myPackage import tools as tl
+from os.path import join, altsep, basename
 
 def process(skeleton, name, plot= False, path= None):
     print("Minutiae extraction...")
+    img = cv2.cvtColor(skeleton, cv2.COLOR_GRAY2BGR)
+    (h,w) = skeleton.shape[:2]
+    if path is not None:
+        filename = 'minutiae_'+name+'.txt'
+        full_name = altsep.join((path, filename))
+        file = open(full_name, 'w')
+        file.write('# (x, y) position of minutiae and type as class (0: termination, 1: bifurcation)\n')
+    for i in range(h):
+        for j in range(w):
+            if skeleton[i, j] == 255:
+                # En caso de valer 255 se analizan sus vecinos,
+                # para saber si se trata de una terminación o de una bifurcación
 
+                window = skeleton[i - 1:i + 2, j - 1:j + 2]
+                neighbours = sum(window.ravel()) // 255
 
-def processHarris(skeleton, name, plot= False, path= None):
-    # harris_corners = np.zeros_like(skeleton.shape, cv2.CV_32FC1)
-    harris_corners = cv2.cornerHarris(skeleton, 2, 3, 0.04, cv2.BORDER_DEFAULT)
-    harris_normalised = cv2.normalize(harris_corners, 0, 255, cv2.NORM_MINMAX, cv2.CV_32FC1)
-    threshold = 125
-    keypoints = []
-    rescaled = cv2.convertScaleAbs(harris_normalised)
-    harris_c = np.zeros((rescaled.rows, rescaled.cols, cv2.CV_8UC3))
-    # vect = []
-    for i in range(2):
-        vect = np.hstack(rescaled)
-    from_to = [0.0, 1.1, 2.2]
-    cv2.mixChannels(vect, harris_c, from_to)
-    for x in range(harris_normalised.cols):
-        for y in range(harris_normalised.rows):
-            if int(harris_normalised[y, x]) > threshold:
-                cv2.circle(harris_c, (x, y), 5, (0, 255, 0), 1)
-                cv2.circle(harris_c, (x, y), 1, (0, 0, 255), 1)
-                keypoints.append(cv2.KeyPoint(x, y, 1))
+                if neighbours == 2:
+                    # En caso de que los vecinos sean igual a 2 (Contando el mismo píxel que se analiza)
+                    # se trataría de una terminación y esta se almacenaría en el archivo fichero,
+                    # también se dibuja en la imágenes un circulo de color verde.
+                    if path is not None:
+                        file.write(str(i) + ',' + str(j) + ',0\n')
+                    cv2.circle(img, (j, i), 1, (0, 255, 0), 1)
+
+                if neighbours > 3:
+                    # En caso de que los vecinos sean mayores a 3 (Contando el mismo píxel que se analiza)
+                    # se trataría de una bifurcación y esta se almacenaría en el archivo fichero,
+                    # también se dibuja en la imágenes un circulo de color rojo.
+                    if path is not None:
+                        file.write(str(i) + ',' + str(j) + ',1\n')
+                    cv2.circle(img, (j, i), 1, (255, 0, 0), 1)
     if plot:
-        titles = ["skeleton", "keypoints"]
-        images = [skeleton, harris_c]
-        title = "Key Points"
-        tl.plotImages(titles, images, title, 1, 2)
+        cv2.imshow("Minutiae '{}'".format(name), img)
+        cv2.waitKey(2000)
+        cv2.destroyAllWindows()
